@@ -1,21 +1,23 @@
 module Rubyzilla
   class Product
     attr_accessor :id, :name
-    
-    def initialize id
-      product = Bugzilla.server.call("Product.get_products", {:ids => [id]})
-      @id = id
+
+    # Rather than search for projects by id, which is not readily available to the user, search
+    # by product name
+    def initialize name
+      product = Bugzilla.server.call("Product.get_products", {:names => [name]})
+      #product = Bugzilla.server.call("Product.get_products", {:ids => [id]})
+      @id = product["products"][0]["id"]
       @name = product["products"][0]["name"]
     end
     
     # accessible, enterable, selectable
     def self.list s="accessible"
       product_list = Array.new
-      
-      product_ids =
-        Bugzilla.server.call("Product.get_#{s}_products")["ids"]
-        
-      product_ids.map {|id| product_list << Product.new(id)}
+
+      product_names = Bugzilla.server.call("Product.get_#{s}_products")["names"]
+
+      product_names.map {|name| product_list << Product.new(name) }
       return product_list
     end
     
