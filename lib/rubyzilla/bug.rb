@@ -70,8 +70,8 @@ module Rubyzilla
         @status       = result["bugs"][0]["status"]
         #@target_milestone = result["bugs"][0]["internals"]["target_milestone"]
         #@severity     = result["bugs"][0]["internals"]["bug_severity"]
-        #@created_at
-        #@updated_at
+        @created_at   = result["bugs"][0]["creation_time"]
+        @updated_at   = result["bugs"][0]["last_change_time"]
       end
       return self
     end
