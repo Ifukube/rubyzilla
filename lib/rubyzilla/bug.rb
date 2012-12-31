@@ -25,8 +25,8 @@ module Rubyzilla
     attr_accessor :status
     attr_accessor :target_milestone
     attr_accessor :severity
-    attr_accessor :created_at
-    attr_accessor :updated_at
+    attr_accessor :creation_time
+    attr_accessor :last_change_time
 
 =begin
     # Required create parameters
@@ -44,13 +44,17 @@ module Rubyzilla
 =end
 
     # To hold raw client data that came back from bugzilla
-    attr_accessor :client
+    attr_accessor :system_data
 
     def initialize id=nil
       unless id.nil?
-        result = Bugzilla.server.call("Bug.get_bugs", {:ids => [id]})
+        result = Bugzilla.server.call("Bug.get", {:ids => [id],
+                                                  :include_fields => [:id, :product, :component, :summary, :version,
+                                                                      :status, :creation_time, :last_change_time,
+                                                                      :flags, :depends_on, :blocks, :clone_of]})
+        #result = Bugzilla.server.call("Bug.get_bugs", {:ids => [id]})
 
-        @client = result['bugs'][0]
+        @system_data = result['bugs'][0]
 
         # TODO: These all need rework
         @id           = result["bugs"][0]["id"]
@@ -70,8 +74,8 @@ module Rubyzilla
         @status       = result["bugs"][0]["status"]
         #@target_milestone = result["bugs"][0]["internals"]["target_milestone"]
         #@severity     = result["bugs"][0]["internals"]["bug_severity"]
-        #@created_at
-        #@updated_at
+        @creation_time   = result["bugs"][0]["creation_time"]
+        @last_change_time   = result["bugs"][0]["last_change_time"]
       end
       return self
     end
