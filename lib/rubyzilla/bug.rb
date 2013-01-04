@@ -11,6 +11,7 @@ module Rubyzilla
     attr_accessor :op_sys
     attr_accessor :platform
     attr_accessor :priority
+    attr_accessor :severity
     attr_accessor :description
     attr_accessor :alias
     attr_accessor :qa_contact
@@ -48,11 +49,7 @@ module Rubyzilla
 
     def initialize id=nil
       unless id.nil?
-        result = Bugzilla.server.call("Bug.get", {:ids => [id],
-                                                  :include_fields => [:id, :product, :component, :summary, :version,
-                                                                      :status, :creation_time, :last_change_time,
-                                                                      :flags, :depends_on, :blocks, :clone_of]})
-        #result = Bugzilla.server.call("Bug.get_bugs", {:ids => [id]})
+        result = Bugzilla.server.call("Bug.get", {:ids => [id], :extra_fields => [:flags]})
 
         @system_data = result['bugs'][0]
 
@@ -65,15 +62,15 @@ module Rubyzilla
         @version      = result["bugs"][0]["version"][0]
         #@op_sys       = result["bugs"][0]["internals"]["op_sys"]
         #@platform     = result["bugs"][0]["internals"]["rep_platform"]
-        #@priority     = result["bugs"][0]["internals"]["priority"]
+        @priority     = result["bugs"][0]["priority"]
         #@description  = result["bugs"][0]["internals"]["short_desc"]
         #@alias        = result["bugs"][0]["alias"]
         #@qa_contact   = result["bugs"][0]["internals"]["qa_contact"]
-        #@assignee
-        #@requestor
+        @assignee     = result["bugs"][0]["assigned_to"]
+        @requestor    = result["bugs"][0]["creator"]
         @status       = result["bugs"][0]["status"]
         #@target_milestone = result["bugs"][0]["internals"]["target_milestone"]
-        #@severity     = result["bugs"][0]["internals"]["bug_severity"]
+        @severity     = result["bugs"][0]["severity"]
         @creation_time   = result["bugs"][0]["creation_time"]
         @last_change_time   = result["bugs"][0]["last_change_time"]
       end
