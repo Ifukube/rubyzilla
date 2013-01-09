@@ -120,5 +120,12 @@ module Rubyzilla
         Bugzilla.server.call("Bug.add_comment", {:id => id, :comment => comment}) 
       end
     end
+
+    def send_update(attributes)
+      result = Bugzilla.server.call("Bug.update", attributes)
+
+      result
+    end
+
   end
 end
